@@ -52,7 +52,7 @@ const Layout = async ({ children }: LayoutProps) => {
                     <li key={sideOption.id}>
                       <Link
                         href={sideOption.href}
-                        className="text-gray-700 hover:text-indigo-600 hover:bg-gray-50 flex items-center gap-3 rounded-md py-2 text-sm leading-3 font-semibold"
+                        className="text-gray-700 group hover:text-indigo-600 hover:bg-gray-50 flex items-center gap-3 rounded-md py-2 text-sm leading-3 font-semibold"
                       >
                         <span className="text-gray-400 border-gray-200 group-hover:border-indigo-600 group-hover:text-indigo-600 flex h-6 w-6 shrink-0 justify-center items-center rounded-lg border text-[0.625rem] font-medium bg-white">
                           <Icon className="h-4 w-4" />
