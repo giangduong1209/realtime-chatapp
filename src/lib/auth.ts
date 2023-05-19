@@ -7,10 +7,12 @@ import isEmpty from "lodash";
 const getGoogleCredentials = () => {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  if (isEmpty(clientId)) {
+
+  if (!clientId || clientId.length === 0) {
     throw new Error("Missing GOOGLE_CLIENT_ID");
   }
-  if (isEmpty(clientSecret)) {
+
+  if (!clientSecret || clientSecret.length === 0) {
     throw new Error("Missing GOOGLE_CLIENT_SECRET");
   }
   return { clientId, clientSecret };
@@ -26,22 +28,25 @@ export const authOptions: NextAuthOptions = {
   },
   providers: [
     GoogleProvider({
-      clientId: getGoogleCredentials().clientId!,
-      clientSecret: getGoogleCredentials().clientSecret!,
+      clientId: getGoogleCredentials().clientId,
+      clientSecret: getGoogleCredentials().clientSecret,
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
-      const dbUser = (await db.get(`user:${token.id}`)) as User | null;
-      if (isEmpty(dbUser)) {
-        token.id = user!.id;
+      const dbUserResult = (await db.get(`user:${token.id}`)) as User;
+      if (!dbUserResult) {
+        if (user) {
+          token.id = user.id;
+        }
         return token;
       }
+      // const dbUser = JSON.parse(dbUserResult) as User;
       return {
-        id: dbUser!.id,
-        name: dbUser!.name,
-        email: dbUser!.email,
-        picture: dbUser!.image,
+        id: dbUserResult.id,
+        name: dbUserResult.name,
+        email: dbUserResult.email,
+        picture: dbUserResult.image,
       };
     },
     async session({ session, token }) {
