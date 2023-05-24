@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import React from "react";
 import Image from "next/image";
 import Messages from "@/components/Messages";
+import ChatInput from "@/components/ChatInput";
 
 interface PageProps {
   params: {
@@ -28,6 +29,7 @@ const getChatMessage = async (chatId: string) => {
     const reversedDbMessaged = dbMessage.reverse();
 
     const messages = messagesArrayValidator.parse(reversedDbMessaged);
+    return messages;
   } catch (error) {
     notFound();
   }
@@ -72,7 +74,8 @@ const page = async ({ params }: PageProps) => {
           </div>
         </div>
       </div>
-      <Messages />
+      <Messages sessionId={session.user.id} initialMessages={initialMessages} />
+      <ChatInput chatPartner={chatPartner} />
     </div>
   );
 };
