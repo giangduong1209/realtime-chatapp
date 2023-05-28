@@ -43,7 +43,7 @@ const UnSeenChatToast: React.FC<UnSeenChatToastProps> = ({
                 className="rounded-full"
                 src={senderImg}
                 alt={`${senderName} profile picture`}
-              ></Image>
+              />
             </div>
           </div>
           <div className="ml-3 flex-1">
