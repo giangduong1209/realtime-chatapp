@@ -37,7 +37,7 @@ const Messages: React.FC<MessagesProps> = ({
       pusherClient.unsubscribe(toPusherKey(`chat:${chatId}`));
       pusherClient.unbind("incoming-message", messageHandler);
     };
-  }, []);
+  }, [chatId]);
   const formatTimestamp = (timestamp: number) => format(timestamp, "HH:mm");
 
   return (

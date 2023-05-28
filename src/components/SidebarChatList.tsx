@@ -1,11 +1,19 @@
 "use client";
-import { chatHrefConstructor } from "@/lib/utils";
+import { pusherClient } from "@/lib/pusher";
+import { chatHrefConstructor, toPusherKey } from "@/lib/utils";
 import { usePathname, useRouter } from "next/navigation";
 import React, { FC, useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
+import UnSeenChatToast from "./UnSeenChatToast";
 
 interface SidebarChatListProps {
   friends: User[];
   sessionId: string;
+}
+
+interface ExtentedMessage extends Message {
+  senderImg: string;
+  senderName: string;
 }
 
 const SidebarChatList: FC<SidebarChatListProps> = ({ friends, sessionId }) => {
@@ -14,12 +22,46 @@ const SidebarChatList: FC<SidebarChatListProps> = ({ friends, sessionId }) => {
   const [unseenMessages, setUnseenMessages] = useState<Message[]>();
 
   useEffect(() => {
+    pusherClient.subscribe(toPusherKey(`user:${sessionId}:chats`));
+    pusherClient.subscribe(toPusherKey(`user:${sessionId}:friends`));
+
+    const chatHandler = (message: ExtentedMessage) => {
+      const shouldNotify =
+        pathname !==
+        `/dashboard/chat/${chatHrefConstructor(sessionId, message.senderId)}`;
+      if (!shouldNotify) return;
+      toast.custom((t) => (
+        <UnSeenChatToast
+          t={t}
+          sessionId={sessionId}
+          senderId={message.senderId}
+          senderImg={message.senderImg}
+          senderMessage={message.text}
+          senderName={message.senderName}
+        />
+      ));
+    };
+
+    const newFriendHandler = () => {
+      router.refresh();
+    };
+
+    pusherClient.bind("new_message", chatHandler);
+    pusherClient.bind("new_friend", newFriendHandler);
+
+    return () => {
+      pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:chats`));
+      pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:friends`));
+    };
+  }, [pathname, sessionId, router]);
+
+  useEffect(() => {
     if (pathname?.includes("chat")) {
       setUnseenMessages((prev) =>
         prev?.filter((msg) => !pathname.includes(msg.senderId))
       );
     }
-  }, []);
+  }, [sessionId, pathname, router]);
 
   return (
     <ul role="list" className="max-h-[25rem] overflow-y-auto -mx-2 space-y-1">
