@@ -26,14 +26,12 @@ const page = async ({}) => {
       )) as string[];
 
       const lastMessage = JSON.parse(lastMessageRaw) as Message;
-      console.log(lastMessage);
       return {
         ...friend,
         lastMessage,
       };
     })
   );
-  console.log("friendsWithLastMessage", friendsWithLastMessage);
   return (
     <div className="container py-12">
       <h1 className="font-bold text-5xl mb-8">Recent chats</h1>
